@@ -4,8 +4,9 @@ PIP = $(VENV)/bin/pip
 
 REQUIREMENTS = requirements.txt
 
-TRAIN_DATA = dataset_train.csv
-TEST_DATA = dataset_test.csv
+DATA_DIR = datasets
+TRAIN_DATA = $(DATA_DIR)/dataset_train.csv
+TEST_DATA = $(DATA_DIR)/dataset_test.csv
 WEIGHTS = weights.json
 PREDICTION = houses.csv
 
@@ -44,4 +45,4 @@ fclean: clean
 
 re: fclean all
 	
-.PHONY: all venv describe histogram scatter pair_plot train predict clean fclean re
+.PHONY: all describe histogram scatter pair_plot train predict clean fclean re
