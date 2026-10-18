@@ -1,0 +1,18 @@
+# 42 Confidential
+*.subject.pdf
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+params.json
+
+# Vim
+.*.sw[a-p]
+*.sw[a-p]
+.*.swo
+.*.swp
+
+# Linux
+*~
+.directory
