@@ -26,9 +26,7 @@ def std(
     return math.sqrt(max(0.0, variance))
 
 
-def percentile(
-    sorted_list: list[float], p: float, count: int | None = None
-) -> float:
+def percentile(sorted_list: list[float], p: float, count: int | None = None) -> float:
     n = count if count is not None else len(sorted_list)
     if n <= 0 or math.isnan(p) or not (0.0 <= p <= 1.0):
         return float("nan")
@@ -103,8 +101,3 @@ def kurtosis(z: list[float], count: int | None = None) -> float:
     term1 = (n * (n + 1) / ((n - 1) * (n - 2) * (n - 3))) * sum_z4
     term2 = (3 * (n - 1) ** 2) / ((n - 2) * (n - 3))
     return term1 - term2
-
-
-# Statistical aliases
-g1 = skewness
-g2 = kurtosis
