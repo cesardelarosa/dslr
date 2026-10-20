@@ -57,7 +57,7 @@ def mad(
     return sum(abs(xi - mu) for xi in x) / n
 
 
-def z_score(
+def standardize(
     x: list[float],
     count: int | None = None,
     mean_val: float | None = None,
@@ -101,3 +101,48 @@ def kurtosis(z: list[float], count: int | None = None) -> float:
     term1 = (n * (n + 1) / ((n - 1) * (n - 2) * (n - 3))) * sum_z4
     term2 = (3 * (n - 1) ** 2) / ((n - 2) * (n - 3))
     return term1 - term2
+
+
+def describe_feature(raw_data: list[float]) -> dict[str, float]:
+    clean_data = [x for x in raw_data if math.isfinite(x)]
+    n = len(clean_data)
+    nan_count = len(raw_data) - n
+
+    mu = mean(clean_data, count=n)
+    s = std(clean_data, count=n, mean_val=mu)
+
+    sorted_data = sorted(clean_data)
+    val_min = sorted_data[0] if n > 0 else float("nan")
+    val_max = sorted_data[-1] if n > 0 else float("nan")
+    data_range = val_max - val_min if n > 0 else float("nan")
+
+    p25 = percentile(sorted_data, 0.25, count=n)
+    p50 = percentile(sorted_data, 0.5, count=n)
+    p75 = percentile(sorted_data, 0.75, count=n)
+    iqr = p75 - p25 if n > 0 else float("nan")
+
+    z = standardize(clean_data, count=n, mean_val=mu, std_val=s)
+    mad_val = mad(clean_data, count=n, mean_val=mu)
+    g1 = skewness(z, count=n)
+    g2 = kurtosis(z, count=n)
+
+    return {
+        "Count": float(n),
+        "Mean": mu,
+        "Std": s,
+        "Min": val_min,
+        "25%": p25,
+        "50%": p50,
+        "75%": p75,
+        "Max": val_max,
+        "NaNs": float(nan_count),
+        "Range": data_range,
+        "IQR": iqr,
+        "MAD": mad_val,
+        "g1": g1,
+        "g2": g2,
+    }
+
+
+def describe(data: dict[str, list[float]]) -> dict[str, dict[str, float]]:
+    return {ft: describe_feature(values) for ft, values in data.items()}
