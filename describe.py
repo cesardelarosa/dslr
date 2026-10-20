@@ -1,40 +1,56 @@
 import math
 import sys
 
-from dslr.io.reader import read_csv
-from dslr.math.calc_describe import calc_mean, calc_percentile, calc_std
+from dslr.io.reader import extract_numeric_features, read_csv
+from dslr.math.calc_describe import (
+    calc_g1,
+    calc_g2,
+    calc_mad,
+    calc_mean,
+    calc_percentile,
+    calc_std,
+    calc_z,
+)
 
 
 def describe_feature(raw_data: list[float]) -> dict[str, float]:
-
     clean_data = [x for x in raw_data if math.isfinite(x)]
     n = len(clean_data)
+    nan_count = len(raw_data) - n
+
     mu = calc_mean(clean_data, count=n)
     std = calc_std(clean_data, count=n, mean=mu)
 
     sorted_data = sorted(clean_data)
-    min = sorted_data[0]
-    max = sorted_data[n - 1]
-    p25 = calc_percentile(sorted_data, 0.25)
-    p50 = calc_percentile(sorted_data, 0.5)
-    p75 = calc_percentile(sorted_data, 0.75)
+    val_min = sorted_data[0] if n > 0 else float("nan")
+    val_max = sorted_data[-1] if n > 0 else float("nan")
+    rank = val_max - val_min if n > 0 else float("nan")
 
-    nan_count = len(raw_data) - n
-    rank = max - min
-    iqr = p75 - p25
+    p25 = calc_percentile(sorted_data, 0.25, count=n)
+    p50 = calc_percentile(sorted_data, 0.5, count=n)
+    p75 = calc_percentile(sorted_data, 0.75, count=n)
+    iqr = p75 - p25 if n > 0 else float("nan")
+
+    z = calc_z(clean_data, count=n, mean=mu, std=std)
+    mad = calc_mad(clean_data, count=n, mean=mu)
+    g1 = calc_g1(clean_data, count=n, z=z)
+    g2 = calc_g2(clean_data, count=n, z=z)
 
     return {
-        "Count": n,
+        "Count": float(n),
         "Mean": mu,
         "Std": std,
-        "Min": min,
+        "Min": val_min,
         "25%": p25,
         "50%": p50,
         "75%": p75,
-        "Max": max,
-        "NaNs": nan_count,
+        "Max": val_max,
+        "NaNs": float(nan_count),
         "Range": rank,
         "IQR": iqr,
+        "MAD": mad,
+        "g1": g1,
+        "g2": g2,
     }
 
 
@@ -71,7 +87,13 @@ def main():
         sys.exit(1)
 
     csv_path = sys.argv[1]
-    data = read_csv(csv_path)
+    try:
+        df = read_csv(csv_path)
+    except Exception as e:
+        sys.stderr.write(f"Error reading {csv_path}: {e}\n")
+        sys.exit(1)
+
+    data = extract_numeric_features(df)
     processed_data = describe(data)
     print_describe(processed_data)
 
