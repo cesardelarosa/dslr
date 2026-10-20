@@ -1,16 +1,8 @@
 import math
 import sys
 
-from dslr.io.reader import read_numeric_csv
-from dslr.math.calc_describe import (
-    calc_g1,
-    calc_g2,
-    calc_mad,
-    calc_mean,
-    calc_percentile,
-    calc_std,
-    calc_z,
-)
+import dslr.math.calc_describe as calc
+from dslr.io import reader
 
 
 def describe_feature(raw_data: list[float]) -> dict[str, float]:
@@ -18,23 +10,23 @@ def describe_feature(raw_data: list[float]) -> dict[str, float]:
     n = len(clean_data)
     nan_count = len(raw_data) - n
 
-    mu = calc_mean(clean_data, count=n)
-    std = calc_std(clean_data, count=n, mean=mu)
+    mu = calc.calc_mean(clean_data, count=n)
+    std = calc.calc_std(clean_data, count=n, mean=mu)
 
     sorted_data = sorted(clean_data)
     val_min = sorted_data[0] if n > 0 else float("nan")
     val_max = sorted_data[-1] if n > 0 else float("nan")
     rank = val_max - val_min if n > 0 else float("nan")
 
-    p25 = calc_percentile(sorted_data, 0.25, count=n)
-    p50 = calc_percentile(sorted_data, 0.5, count=n)
-    p75 = calc_percentile(sorted_data, 0.75, count=n)
+    p25 = calc.calc_percentile(sorted_data, 0.25, count=n)
+    p50 = calc.calc_percentile(sorted_data, 0.5, count=n)
+    p75 = calc.calc_percentile(sorted_data, 0.75, count=n)
     iqr = p75 - p25 if n > 0 else float("nan")
 
-    z = calc_z(clean_data, count=n, mean=mu, std=std)
-    mad = calc_mad(clean_data, count=n, mean=mu)
-    g1 = calc_g1(clean_data, count=n, z=z)
-    g2 = calc_g2(clean_data, count=n, z=z)
+    z = calc.calc_z(clean_data, count=n, mean=mu, std=std)
+    mad = calc.calc_mad(clean_data, count=n, mean=mu)
+    g1 = calc.calc_g1(clean_data, count=n, z=z)
+    g2 = calc.calc_g2(clean_data, count=n, z=z)
 
     return {
         "Count": float(n),
@@ -88,7 +80,7 @@ def main():
 
     csv_path = sys.argv[1]
     try:
-        data = read_numeric_csv(csv_path)
+        data = reader.read_numeric_csv(csv_path)
     except (OSError, ValueError) as e:
         sys.stderr.write(f"Error: {e}\n")
         sys.exit(1)
