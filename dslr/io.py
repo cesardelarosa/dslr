@@ -19,7 +19,7 @@ def read_numeric_csv(file: str) -> dict[str, list[float]]:
     except (pd.errors.EmptyDataError, pd.errors.ParserError) as e:
         raise ValueError(f"Invalid or empty CSV: {e}") from e
 
-    return extract_numeric_features(df)
-
-
-read_numbers_csv = read_numeric_csv
+    data = extract_numeric_features(df)
+    if not data:
+        raise ValueError("No numeric features found in dataset")
+    return data

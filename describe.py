@@ -1,8 +1,7 @@
 import math
 import sys
 
-import dslr.math.calc_describe as calc
-from dslr.io import reader
+from dslr import io, stats
 
 
 def describe_feature(raw_data: list[float]) -> dict[str, float]:
@@ -10,35 +9,35 @@ def describe_feature(raw_data: list[float]) -> dict[str, float]:
     n = len(clean_data)
     nan_count = len(raw_data) - n
 
-    mu = calc.calc_mean(clean_data, count=n)
-    std = calc.calc_std(clean_data, count=n, mean=mu)
+    mu = stats.mean(clean_data, count=n)
+    s = stats.std(clean_data, count=n, mean_val=mu)
 
     sorted_data = sorted(clean_data)
     val_min = sorted_data[0] if n > 0 else float("nan")
     val_max = sorted_data[-1] if n > 0 else float("nan")
-    rank = val_max - val_min if n > 0 else float("nan")
+    data_range = val_max - val_min if n > 0 else float("nan")
 
-    p25 = calc.calc_percentile(sorted_data, 0.25, count=n)
-    p50 = calc.calc_percentile(sorted_data, 0.5, count=n)
-    p75 = calc.calc_percentile(sorted_data, 0.75, count=n)
+    p25 = stats.percentile(sorted_data, 0.25, count=n)
+    p50 = stats.percentile(sorted_data, 0.5, count=n)
+    p75 = stats.percentile(sorted_data, 0.75, count=n)
     iqr = p75 - p25 if n > 0 else float("nan")
 
-    z = calc.calc_z(clean_data, count=n, mean=mu, std=std)
-    mad = calc.calc_mad(clean_data, count=n, mean=mu)
-    g1 = calc.calc_g1(clean_data, count=n, z=z)
-    g2 = calc.calc_g2(clean_data, count=n, z=z)
+    z = stats.z_score(clean_data, count=n, mean_val=mu, std_val=s)
+    mad = stats.mad(clean_data, count=n, mean_val=mu)
+    g1 = stats.skewness(z, count=n)
+    g2 = stats.kurtosis(z, count=n)
 
     return {
         "Count": float(n),
         "Mean": mu,
-        "Std": std,
+        "Std": s,
         "Min": val_min,
         "25%": p25,
         "50%": p50,
         "75%": p75,
         "Max": val_max,
         "NaNs": float(nan_count),
-        "Range": rank,
+        "Range": data_range,
         "IQR": iqr,
         "MAD": mad,
         "g1": g1,
@@ -80,7 +79,7 @@ def main():
 
     csv_path = sys.argv[1]
     try:
-        data = reader.read_numeric_csv(csv_path)
+        data = io.read_numeric_csv(csv_path)
     except (OSError, ValueError) as e:
         sys.stderr.write(f"Error: {e}\n")
         sys.exit(1)
