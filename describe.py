@@ -1,7 +1,7 @@
 import math
 import sys
 
-from dslr.io.reader import extract_numeric_features, read_csv
+from dslr.io.reader import read_numeric_csv
 from dslr.math.calc_describe import (
     calc_g1,
     calc_g2,
@@ -88,12 +88,11 @@ def main():
 
     csv_path = sys.argv[1]
     try:
-        df = read_csv(csv_path)
-    except Exception as e:
-        sys.stderr.write(f"Error reading {csv_path}: {e}\n")
+        data = read_numeric_csv(csv_path)
+    except (OSError, ValueError) as e:
+        sys.stderr.write(f"Error: {e}\n")
         sys.exit(1)
 
-    data = extract_numeric_features(df)
     processed_data = describe(data)
     print_describe(processed_data)
 
