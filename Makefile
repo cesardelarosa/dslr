@@ -27,7 +27,7 @@ histogram: $(VENV)
 scatter: $(VENV)
 	$(PYTHON) scatter_plot.py $(TRAIN_DATA)
 
-pair_plot: $(VENV)
+pair: $(VENV)
 	$(PYTHON) pair_plot.py $(TRAIN_DATA)
 
 train: $(VENV)
@@ -45,4 +45,4 @@ fclean: clean
 
 re: fclean all
 	
-.PHONY: all describe histogram scatter pair_plot train predict clean fclean re
+.PHONY: all describe histogram scatter pair train predict clean fclean re

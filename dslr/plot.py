@@ -45,9 +45,9 @@ def plot_course_histogram(df: pd.DataFrame) -> None:
             scores = house_dfs[house][course].dropna()
             ax.hist(
                 scores,
-                bins=10,
+                bins=20,
                 range=(r_min, r_max),
-                alpha=0.6,
+                alpha=0.5,
                 label=house,
                 color=HOUSE_COLORS[house],
             )
@@ -63,7 +63,13 @@ def plot_course_histogram(df: pd.DataFrame) -> None:
     )
     fig.suptitle("Courses Scores Histogram per Hogwarts House")
 
-    for j in range(n_courses, n_rows * n_cols):
-        fig.delaxes(axes[j])
+    for ax in axes[n_courses:]:
+        fig.delaxes(ax)
 
+    plt.show()
+
+def plot_course_scatter(df: pd.DataFrame) -> None:
+    plt.show()
+
+def plot_course_pair(df: pd.DataFrame) -> None:
     plt.show()

@@ -7,13 +7,14 @@ from dslr.stats import describe
 
 def main() -> None:
     if len(sys.argv) != 2:
-        sys.stderr.write("Usage: python3 describe.py <dataset.csv>\n")
+        sys.stderr.write(f"Usage: python3 {sys.argv[0]} <dataset.csv>\n")
         sys.exit(1)
 
     try:
         data = read_numeric_csv(sys.argv[1])
         summary = describe(data)
         print_summary(summary)
+    
     except (OSError, ValueError) as e:
         sys.stderr.write(f"Error: {e}\n")
         sys.exit(1)

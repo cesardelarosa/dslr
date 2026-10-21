@@ -6,7 +6,7 @@ from dslr.plot import plot_course_histogram
 
 def main(): 
     if len(sys.argv) != 2:
-        sys.stderr.write("Usage: python3 histogram.py <dataset.csv>\n")
+        sys.stderr.write(f"Usage: python3 {sys.argv[0]} <dataset.csv>\n")
         sys.exit(1)
 
     try:
